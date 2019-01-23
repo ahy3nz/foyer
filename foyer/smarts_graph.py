@@ -58,8 +58,10 @@ class SMARTSGraph(nx.Graph):
     def _add_edges(self, ast_node, trunk=None):
         """"Add all bonds in the SMARTS string as edges in the graph."""
         atom_indices = self._atom_indices
-        for atom in ast_node.tail:
-            if atom.head == 'atom':
+        #for atom in ast_node.tail:
+        for atom in ast_node.children:
+            #if atom.head == 'atom':
+            if atom.data == 'atom':
                 atom_idx = atom_indices[id(atom)]
                 if atom.is_first_kid and atom.parent().head == 'branch':
                     trunk_idx = atom_indices[id(trunk)]
