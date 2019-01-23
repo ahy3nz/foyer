@@ -89,7 +89,8 @@ class SMARTSGraph(nx.Graph):
         # would yield e.g. the string '12' so split those up.
         label_digits = defaultdict(list)
         for label in labels:
-            digits = list(label.tail[0])
+            #digits = list(label.tail[0])
+            digits = list(label.children[0])
             for digit in digits:
                 label_digits[digit].append(label.parent())
 
@@ -99,21 +100,29 @@ class SMARTSGraph(nx.Graph):
             self.add_edge(atom1_idx, atom2_idx)
 
     def _node_match(self, host, pattern):
-        atom_expr = pattern['atom'].tail[0]
+        #atom_expr = pattern['atom'].tail[0]
+        atom_expr = pattern['atom'].children[0]
         atom = host['atom']
         return self._atom_expr_matches(atom_expr, atom)
 
     def _atom_expr_matches(self, atom_expr, atom):
         if atom_expr.head == 'not_expression':
-            return not self._atom_expr_matches(atom_expr.tail[0], atom)
+            #return not self._atom_expr_matches(atom_expr.tail[0], atom)
+            return not self._atom_expr_matches(atom_expr.children[0], atom)
         elif atom_expr.head in ('and_expression', 'weak_and_expression'):
-            return (self._atom_expr_matches(atom_expr.tail[0], atom) and
-                    self._atom_expr_matches(atom_expr.tail[1], atom))
+            #return (self._atom_expr_matches(atom_expr.tail[0], atom) and
+            return (self._atom_expr_matches(atom_expr.children[0], atom) and
+                    #self._atom_expr_matches(atom_expr.tail[1], atom))
+                    self._atom_expr_matches(atom_expr.children[1], atom))
         elif atom_expr.head == 'or_expression':
-            return (self._atom_expr_matches(atom_expr.tail[0], atom) or
-                    self._atom_expr_matches(atom_expr.tail[1], atom))
+            #return (self._atom_expr_matches(atom_expr.tail[0], atom) or
+            #        self._atom_expr_matches(atom_expr.tail[1], atom))
+            return (self._atom_expr_matches(atom_expr.children[0], atom) or
+                    self._atom_expr_matches(atom_expr.children[1], atom))
+
         elif atom_expr.head == 'atom_id':
-            return self._atom_id_matches(atom_expr.tail[0], atom)
+            #return self._atom_id_matches(atom_expr.tail[0], atom)
+            return self._atom_id_matches(atom_expr.children[0], atom)
         elif atom_expr.head == 'atom_symbol':
             return self._atom_id_matches(atom_expr, atom)
         else:
@@ -125,28 +134,37 @@ class SMARTSGraph(nx.Graph):
     def _atom_id_matches(atom_id, atom):
         atomic_num = atom.element.atomic_number
         if atom_id.head == 'atomic_num':
-            return atomic_num == int(atom_id.tail[0])
+            #return atomic_num == int(atom_id.tail[0])
+            return atomic_num == int(atom_id.children[0])
         elif atom_id.head == 'atom_symbol':
-            if str(atom_id.tail[0]) == '*':
+            #if str(atom_id.tail[0]) == '*':
+            if str(atom_id.children[0]) == '*':
                 return True
-            elif str(atom_id.tail[0]).startswith('_'):
-                return atom.element.name == str(atom_id.tail[0])
+            #elif str(atom_id.tail[0]).startswith('_'):
+            elif str(atom_id.children[0]).startswith('_'):
+                #return atom.element.name == str(atom_id.tail[0])
+                return atom.element.name == str(atom_id.children[0])
             else:
-                return atomic_num == pt.AtomicNum[str(atom_id.tail[0])]
+                #return atomic_num == pt.AtomicNum[str(atom_id.tail[0])]
+                return atomic_num == pt.AtomicNum[str(atom_id.childrenl[0])]
         elif atom_id.head == 'has_label':
-            label = atom_id.tail[0][1:]  # Strip the % sign from the beginning.
+            #label = atom_id.tail[0][1:]  # Strip the % sign from the beginning.
+            label = atom_id.children[0][1:]  # Strip the % sign from the beginning.
             return label in atom.whitelist
         elif atom_id.head == 'neighbor_count':
-            return len(atom.bond_partners) == int(atom_id.tail[0])
+            #return len(atom.bond_partners) == int(atom_id.tail[0])
+            return len(atom.bond_partners) == int(atom_id.children[0])
         elif atom_id.head == 'ring_size':
-            cycle_len = int(atom_id.tail[0])
+            #cycle_len = int(atom_id.tail[0])
+            cycle_len = int(atom_id.children[0])
             for cycle in atom.cycles:
                 if len(cycle) == cycle_len:
                     return True
             return False
         elif atom_id.head == 'ring_count':
             n_cycles = len(atom.cycles)
-            if n_cycles == int(atom_id.tail[0]):
+            #if n_cycles == int(atom_id.tail[0]):
+            if n_cycles == int(atom_id.children[0]):
                 return True
             return False
         elif atom_id.head == 'matches_string':
