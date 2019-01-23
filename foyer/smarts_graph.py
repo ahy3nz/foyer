@@ -74,12 +74,14 @@ class SMARTSGraph(nx.Graph):
                         trunk = atom
                 else:  # We traveled through the whole branch.
                     return
-            elif atom.head == 'branch':
+            #elif atom.head == 'branch':
+            elif atom.data == 'branch':
                 self._add_edges(atom, trunk)
 
     def _add_label_edges(self):
         """Add edges between all atoms with the same atom_label in rings."""
-        labels = self.ast.select('atom_label')
+        #labels = self.ast.select('atom_label')
+        labels = self.ast.find_data('atom_label')
         if not labels:
             return
 
@@ -166,7 +168,8 @@ class SMARTSGraph(nx.Graph):
         """
         # Note: Needs to be updated in sync with the grammar in `smarts.py`.
         ring_tokens = ['ring_size', 'ring_count']
-        has_ring_rules = any(self.ast.select(token)
+        #has_ring_rules = any(self.ast.select(token)
+        has_ring_rules = any(self.ast.find_data(token)
                              for token in ring_tokens)
         _prepare_atoms(topology, compute_cycles=has_ring_rules)
 
@@ -178,12 +181,15 @@ class SMARTSGraph(nx.Graph):
 
         if self._graph_matcher is None:
             atom = nx.get_node_attributes(self, name='atom')[0]
-            if len(atom.select('atom_symbol')) == 1 and not atom.select('not_expression'):
+            #if len(atom.select('atom_symbol')) == 1 and not atom.select('not_expression'):
+            if len(atom.find_data('atom_symbol')) == 1 and not atom.find_data('not_expression'):
                 try:
-                    element = atom.select('atom_symbol').strees[0].tail[0]
+                    #element = atom.select('atom_symbol').strees[0].tail[0]
+                    element = atom.find_data('atom_symbol').strees[0].children[0]
                 except IndexError:
                     try:
-                        atomic_num = atom.select('atomic_num').strees[0].tail[0]
+                        #atomic_num = atom.select('atomic_num').strees[0].tail[0]
+                        atomic_num = atom.find_data('atomic_num').strees[0].children[0]
                         element = pt.Element[int(atomic_num)]
                     except IndexError:
                         element = None
