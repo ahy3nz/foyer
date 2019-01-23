@@ -63,14 +63,18 @@ class SMARTSGraph(nx.Graph):
             #if atom.head == 'atom':
             if atom.data == 'atom':
                 atom_idx = atom_indices[id(atom)]
-                if atom.is_first_kid and atom.parent().head == 'branch':
+                parent = list(self.ast.find_pred(lambda t: atom in t.children))[0]
+                #if atom.is_first_kid and atom.parent().head == 'branch':
+                if atom.is_first_kid and parent.data == 'branch':
                     trunk_idx = atom_indices[id(trunk)]
                     self.add_edge(atom_idx, trunk_idx)
                 if not atom.is_last_kid:
-                    if atom.next_kid.head == 'atom':
+                    #if atom.next_kid.head == 'atom':
+                    if atom.next_kid.data == 'atom':
                         next_idx = atom_indices[id(atom.next_kid)]
                         self.add_edge(atom_idx, next_idx)
-                    elif atom.next_kid.head == 'branch':
+                    #elif atom.next_kid.head == 'branch':
+                    elif atom.next_kid.data == 'branch':
                         trunk = atom
                 else:  # We traveled through the whole branch.
                     return
@@ -92,7 +96,9 @@ class SMARTSGraph(nx.Graph):
             #digits = list(label.tail[0])
             digits = list(label.children[0])
             for digit in digits:
-                label_digits[digit].append(label.parent())
+                parent = list(self.ast.find_pred(lambda t: label in t.children))[0]
+                label_digits[digit].append(parent)
+                #label_digits[digit].append(label.parent())
 
         for label, (atom1, atom2) in label_digits.items():
             atom1_idx = self._atom_indices[id(atom1)]
@@ -106,37 +112,45 @@ class SMARTSGraph(nx.Graph):
         return self._atom_expr_matches(atom_expr, atom)
 
     def _atom_expr_matches(self, atom_expr, atom):
-        if atom_expr.head == 'not_expression':
+        #if atom_expr.head == 'not_expression':
+        if atom_expr.data == 'not_expression':
             #return not self._atom_expr_matches(atom_expr.tail[0], atom)
             return not self._atom_expr_matches(atom_expr.children[0], atom)
-        elif atom_expr.head in ('and_expression', 'weak_and_expression'):
+        #elif atom_expr.head in ('and_expression', 'weak_and_expression'):
+        elif atom_expr.data in ('and_expression', 'weak_and_expression'):
             #return (self._atom_expr_matches(atom_expr.tail[0], atom) and
             return (self._atom_expr_matches(atom_expr.children[0], atom) and
                     #self._atom_expr_matches(atom_expr.tail[1], atom))
                     self._atom_expr_matches(atom_expr.children[1], atom))
-        elif atom_expr.head == 'or_expression':
+        #elif atom_expr.head == 'or_expression':
+        elif atom_expr.data == 'or_expression':
             #return (self._atom_expr_matches(atom_expr.tail[0], atom) or
             #        self._atom_expr_matches(atom_expr.tail[1], atom))
             return (self._atom_expr_matches(atom_expr.children[0], atom) or
                     self._atom_expr_matches(atom_expr.children[1], atom))
 
-        elif atom_expr.head == 'atom_id':
+        #elif atom_expr.head == 'atom_id':
+        elif atom_expr.data == 'atom_id':
             #return self._atom_id_matches(atom_expr.tail[0], atom)
             return self._atom_id_matches(atom_expr.children[0], atom)
-        elif atom_expr.head == 'atom_symbol':
+        #elif atom_expr.head == 'atom_symbol':
+        elif atom_expr.data == 'atom_symbol':
             return self._atom_id_matches(atom_expr, atom)
         else:
             raise TypeError('Expected atom_id, atom_symbol, and_expression, '
                             'or_expression, or not_expression. '
-                            'Got {}'.format(atom_expr.head))
+                            #'Got {}'.format(atom_expr.head))
+                            'Got {}'.format(atom_expr.data))
 
     @staticmethod
     def _atom_id_matches(atom_id, atom):
         atomic_num = atom.element.atomic_number
-        if atom_id.head == 'atomic_num':
+        #if atom_id.head == 'atomic_num':
+        if atom_id.data == 'atomic_num':
             #return atomic_num == int(atom_id.tail[0])
             return atomic_num == int(atom_id.children[0])
-        elif atom_id.head == 'atom_symbol':
+        #elif atom_id.head == 'atom_symbol':
+        elif atom_id.data == 'atom_symbol':
             #if str(atom_id.tail[0]) == '*':
             if str(atom_id.children[0]) == '*':
                 return True
@@ -146,28 +160,33 @@ class SMARTSGraph(nx.Graph):
                 return atom.element.name == str(atom_id.children[0])
             else:
                 #return atomic_num == pt.AtomicNum[str(atom_id.tail[0])]
-                return atomic_num == pt.AtomicNum[str(atom_id.childrenl[0])]
-        elif atom_id.head == 'has_label':
+                return atomic_num == pt.AtomicNum[str(atom_id.children[0])]
+        #elif atom_id.head == 'has_label':
+        elif atom_id.data == 'has_label':
             #label = atom_id.tail[0][1:]  # Strip the % sign from the beginning.
             label = atom_id.children[0][1:]  # Strip the % sign from the beginning.
             return label in atom.whitelist
-        elif atom_id.head == 'neighbor_count':
+        #elif atom_id.head == 'neighbor_count':
+        elif atom_id.data == 'neighbor_count':
             #return len(atom.bond_partners) == int(atom_id.tail[0])
             return len(atom.bond_partners) == int(atom_id.children[0])
-        elif atom_id.head == 'ring_size':
+        #elif atom_id.head == 'ring_size':
+        elif atom_id.data == 'ring_size':
             #cycle_len = int(atom_id.tail[0])
             cycle_len = int(atom_id.children[0])
             for cycle in atom.cycles:
                 if len(cycle) == cycle_len:
                     return True
             return False
-        elif atom_id.head == 'ring_count':
+        #elif atom_id.head == 'ring_count':
+        elif atom_id.data == 'ring_count':
             n_cycles = len(atom.cycles)
             #if n_cycles == int(atom_id.tail[0]):
             if n_cycles == int(atom_id.children[0]):
                 return True
             return False
-        elif atom_id.head == 'matches_string':
+        #elif atom_id.head == 'matches_string':
+        elif atom_id.data == 'matches_string':
             raise NotImplementedError('matches_string is not yet implemented')
 
     def find_matches(self, topology):
@@ -200,14 +219,14 @@ class SMARTSGraph(nx.Graph):
         if self._graph_matcher is None:
             atom = nx.get_node_attributes(self, name='atom')[0]
             #if len(atom.select('atom_symbol')) == 1 and not atom.select('not_expression'):
-            if len(atom.find_data('atom_symbol')) == 1 and not atom.find_data('not_expression'):
+            if len(list(atom.find_data('atom_symbol'))) == 1 and not atom.find_data('not_expression'):
                 try:
                     #element = atom.select('atom_symbol').strees[0].tail[0]
-                    element = atom.find_data('atom_symbol').strees[0].children[0]
+                    element = list(atom.find_data('atom_symbol'))[0].strees[0].children[0]
                 except IndexError:
                     try:
                         #atomic_num = atom.select('atomic_num').strees[0].tail[0]
-                        atomic_num = atom.find_data('atomic_num').strees[0].children[0]
+                        atomic_num = list(atom.find_data('atomic_num'))[0].strees[0].children[0]
                         element = pt.Element[int(atomic_num)]
                     except IndexError:
                         element = None

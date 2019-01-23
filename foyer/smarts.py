@@ -38,23 +38,24 @@ GRAMMAR = (r"""
     ring_count: NUM
 
     // Tokens
-    HASH: "\#"
+    HASH: "#"
     LBRACKET: "["
     RBRACKET: "]"
     LPAR: "("
     RPAR: ")"
-    COMMA: "\,"
+    COMMA: ","
     SEMI: ";"
-    AMP: "\&"
-    STAR: "\*"
-    DOLLAR: "\$"
+    AMP: "&"
+    STAR: "*"
+    DOLLAR: "$"
     NUM: /[0-9]+/
     //NUM: "[\d]+"
-    LABEL: "\%[A-Za-z_0-9]+"
-    EXCL: "\!"
+    //LABEL: "\%[A-Za-z_0-9]"+
+    LABEL: "%" /[_0-9a-zA-Z]+/
+    EXCL: "!"
     // Tokens for chemical elements
     // Optional, custom, non-element underscore-prefixed symbols are pre-pended
-    SYMBOL: "_" | "C" "[laroudsemf]"? | "O" "[s]"? | "N" "[eaibdpos]"? | "S" "[icernbmg]"? | "P" "[drmtboau]"? | "H" "[eofgas]"? | "A" "[lrsgutcm]"+ | "B" "[eraik]"? | "Dy" | "E" "[urs]"+ | "F" "[erm]"? | "G" "[aed]"+ | "I" "[nr]"? | "K" "[r]"? | "L" "[iaur]"+ | "M" "[gnodt]"+ | "R" "[buhenaf]"+ | "T" "[icebmalh]"+ | "U" | "V" | "W" | "Xe" | "Y" "[b]"?| "Z" "[nr]"+
+    SYMBOL: "_" | "C" /[laroudsemf]?/ | "O" /[s]?/ | "N" /[eaibdpos]?/ | "S" /[icernbmg]?/ | "P" /[drmtboau]?/ | "H" /[eofgas]?/ | "A" /[lrsgutcm]+/ | "B" /[eraik]?/ | "Dy" | "E" /[urs]+/ | "F" /[erm]?/ | "G" /[aed]+/ | "I" /[nr]?/ | "K" /[r]?/ | "L" /[iaur]+/ | "M" /[gnodt]+/ | "R" /[buhenaf]+/ | "T" /[icebmalh]+/ | "U" | "V" | "W" | "Xe" | "Y" /[b]?/ | "Z" /[nr]+/
     //SYMBOL: "{optional}C[laroudsemf]?|Os?|N[eaibdpos]?|S[icernbmg]?|P[drmtboau]?|H[eofgas]?|A[lrsgutcm]|B[eraik]?|Dy|E[urs]|F[erm]?|G[aed]|I[nr]?|Kr?|L[iaur]|M[gnodt]|R[buhenaf]|T[icebmalh]|U|V|W|Xe|Yb?|Z[nr]"
 """)
 
