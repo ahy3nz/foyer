@@ -54,7 +54,7 @@ GRAMMAR = (r"""
     EXCL: "\!"
     // Tokens for chemical elements
     // Optional, custom, non-element underscore-prefixed symbols are pre-pended
-    SYMBOL: "C" "[laroudsemf]"? | "O" "[s]"? | "N" "[eaibdpos]"? | "S" "[icernbmg]"? | "P" "[drmtboau]"? | "H" "[eofgas]"? | "A" "[lrsgutcm]"+ | "B" "[eraik]"? | "Dy" | "E" "[urs]"+ | "F" "[erm]"? | "G" "[aed]"+ | "I" "[nr]"? | "K" "[r]"? | "L" "[iaur]"+ | "M" "[gnodt]"+ | "R" "[buhenaf]"+ | "T" "[icebmalh]"+ | "U" | "V" | "W" | "Xe" | "Y" "[b]"?| "Z" "[nr]"+
+    SYMBOL: "_" | "C" "[laroudsemf]"? | "O" "[s]"? | "N" "[eaibdpos]"? | "S" "[icernbmg]"? | "P" "[drmtboau]"? | "H" "[eofgas]"? | "A" "[lrsgutcm]"+ | "B" "[eraik]"? | "Dy" | "E" "[urs]"+ | "F" "[erm]"? | "G" "[aed]"+ | "I" "[nr]"? | "K" "[r]"? | "L" "[iaur]"+ | "M" "[gnodt]"+ | "R" "[buhenaf]"+ | "T" "[icebmalh]"+ | "U" | "V" | "W" | "Xe" | "Y" "[b]"?| "Z" "[nr]"+
     //SYMBOL: "{optional}C[laroudsemf]?|Os?|N[eaibdpos]?|S[icernbmg]?|P[drmtboau]?|H[eofgas]?|A[lrsgutcm]|B[eraik]?|Dy|E[urs]|F[erm]?|G[aed]|I[nr]?|Kr?|L[iaur]|M[gnodt]|R[buhenaf]|T[icebmalh]|U|V|W|Xe|Yb?|Z[nr]"
 """)
 
